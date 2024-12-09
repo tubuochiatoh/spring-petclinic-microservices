@@ -33,7 +33,7 @@ pipeline {
                     //Archive and publish test results of the spring-petclinic"
                     junit '**/target/surefire-reports/*.xml'
                 }
-            }
+            }    
 
         stage('Package Petclinic App') {
             steps {
@@ -73,7 +73,7 @@ pipeline {
                     // Push images
                     sh '''
                     for service in $(ls microservices); do
-                        docker push myregistry/${service}:latest
+                        docker push Ferdinandtubuo/${service}:latest
                     done
                     '''
                 }
@@ -81,10 +81,4 @@ pipeline {
         }  
     }    
 }
-        post {
-        always {
-            echo 'Cleaning up...'
-            sh 'docker system prune -f'
-        }
-
-    }
+    
