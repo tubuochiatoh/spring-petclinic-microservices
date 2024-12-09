@@ -52,7 +52,7 @@ pipeline {
                     // Assuming a Dockerfile is in each microservice directory
                     sh '''
                     for service in $(ls microservices); do
-                        docker build -t Ferdinandtubuo/${service}:latest ./microservices/${service}
+                        docker build -t ferdinandtubuo/${service}:latest ./microservices/${service}
                     done
                     '''
                 }
@@ -64,12 +64,12 @@ pipeline {
                 script {
                     echo 'Pushing Docker images to registry...'
                     // Login to the Docker registry
-                    sh 'docker login -u $Ferdinandtubuo -p $C@madonisquinta19902014 https://app.docker.com/'
+                    sh 'docker login -u $ferdinandtubuo -p $C@madonisquinta19902014 https://app.docker.com/'
 
                     // Push images
                     sh '''
                     for service in $(ls microservices); do
-                        docker push Ferdinandtubuo/${service}:latest
+                        docker push ferdinandtubuo/${service}:latest
                     done
                     '''
                 }
