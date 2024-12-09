@@ -27,13 +27,14 @@ pipeline {
                     sh 'mvn test'
                 }
             }
+        }    
             post {
                 always {
                     //Archive and publish test results of the spring-petclinic"
                     junit '**/target/surefire-reports/*.xml'
                 }
             }
-        }    
+
         stage('Package Petclinic App') {
             steps {
                 script {
@@ -41,6 +42,7 @@ pipeline {
                     sh 'mvn package'
                 }
             }
+        }    
             post {
                 success {
                     // Archive the package artifact and put in a folder
@@ -48,7 +50,7 @@ pipeline {
                 }
             }
 
-               stage('Containerize Microservices') {
+        stage('Containerize Microservices') {
             steps {
                 script {
                     echo 'Building Docker images for microservices...'
@@ -86,4 +88,3 @@ pipeline {
         }
 
     }
-}
