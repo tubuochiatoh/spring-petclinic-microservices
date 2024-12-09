@@ -34,14 +34,15 @@ pipeline {
                     junit '**/target/surefire-reports/*.xml'
                 }
             }       
-    }
+    
         stage('Package Petclinic App') {
             steps {
                 script {
                     // Package the application (For example, create a JAR or WAR file)
                     sh 'mvn package'
                 }
-            }   
+            } 
+        }      
             post {
                 success {
                     // Archive the package artifact and put in a folder
@@ -61,7 +62,8 @@ pipeline {
                     '''
                 }
             } 
-               }   
+        }   
+        
         stage('Push Images to Docker Registry') {
             steps {
                 script {
