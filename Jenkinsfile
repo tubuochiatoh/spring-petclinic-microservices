@@ -47,6 +47,45 @@ pipeline {
                     archiveArtifacts artifacts: 'spring-petclinic-*/target/*.jar', allowEmptyArchive: true
                 }
             }
+
+               stage('Containerize Microservices') {
+            steps {
+                script {
+                    echo 'Building Docker images for microservices...'
+                    // Assuming a Dockerfile is in each microservice directory
+                    sh '''
+                    for service in $(ls microservices); do
+                        docker build -t Ferdinandtubuo/${service}:latest ./microservices/${service}
+                    done
+                    '''
+                }
+            }
+        
+        }
+
+        stage('Push Images to Docker Registry') {
+            steps {
+                script {
+                    echo 'Pushing Docker images to registry...'
+                    // Login to the Docker registry
+                    sh 'docker login -u $Ferdinandtubuo -p $C@madonisquinta19902014 https://app.docker.com/'
+                    
+                    // Push images
+                    sh '''
+                    for service in $(ls microservices); do
+                        docker push myregistry/${service}:latest
+                    done
+                    '''
+                }
+            } 
+        }    
+    }
+}
+
+post {
+        always {
+            echo 'Cleaning up...'
+            sh 'docker system prune -f'
         }
     }
 }
