@@ -86,4 +86,4 @@ post {
             sh 'docker system prune -f'
         }
     }
-        }    
+}    
