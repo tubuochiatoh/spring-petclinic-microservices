@@ -59,7 +59,7 @@ pipeline {
             }
         }   
 
-        stage('Push Images to Docker Registry') {
+        stage('Push Images to Dockerhub Registry') {
             steps {
                 script {
                     echo 'Pushing Docker images to registry...'
