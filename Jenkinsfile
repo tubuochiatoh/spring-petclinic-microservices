@@ -14,7 +14,8 @@ pipeline {
                 }
             }
         }    
-        stage('Build pet clinic') {
+        
+        stage('Build Pet Clinic') {
             steps {
                 sh "mvn clean install"
             }
@@ -23,32 +24,26 @@ pipeline {
         stage('Test Petclinic') {
             steps {
                 script {
-                    //Run Unit Test
+                    // Run Unit Test
                     sh 'mvn test'
                 }
             }
-        }    
-            post {
-                always {
-                    //Archive and publish test results of the spring-petclinic"
-                    junit '**/target/surefire-reports/*.xml'
-                }
-            }       
-    
+        }
+
         stage('Package Petclinic App') {
             steps {
                 script {
                     // Package the application (For example, create a JAR or WAR file)
                     sh 'mvn package'
                 }
-            } 
-        }      
+            }
             post {
                 success {
-                    // Archive the package artifact and put in a folder
+                    // Archive the package artifact and put it in a folder
                     archiveArtifacts artifacts: 'spring-petclinic-*/target/*.jar', allowEmptyArchive: true
                 }
             }
+        }
 
         stage('Containerize Microservices') {
             steps {
@@ -61,7 +56,7 @@ pipeline {
                     done
                     '''
                 }
-            } 
+            }
         }   
 
         stage('Push Images to Docker Registry') {
@@ -70,7 +65,7 @@ pipeline {
                     echo 'Pushing Docker images to registry...'
                     // Login to the Docker registry
                     sh 'docker login -u $Ferdinandtubuo -p $C@madonisquinta19902014 https://app.docker.com/'
-                    
+
                     // Push images
                     sh '''
                     for service in $(ls microservices); do
@@ -78,16 +73,22 @@ pipeline {
                     done
                     '''
                 }
-            } 
+            }
         } 
 
-             post {
-                always {
-                    echo 'Cleaning up ...'
-                    sh 'docker system prune -f'
-                }
-             }
-    }   
+    }
 
+    post {
+        always {
+            echo 'Cleaning up...'
+            sh 'docker system prune -f'
+        }
+        success {
+            // Archive and publish test results of the spring-petclinic
+            junit '**/target/surefire-reports/*.xml'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
 }
-    
