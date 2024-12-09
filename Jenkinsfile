@@ -33,7 +33,7 @@ pipeline {
                     junit '**/target/surefire-reports/*.xml'
                 }
             }
-        }
+        
         stage('Package Petclinic App') {
             steps {
                 script {
@@ -59,9 +59,7 @@ pipeline {
                     done
                     '''
                 }
-            }
-               
-        }    
+            }    
 
         stage('Push Images to Docker Registry') {
             steps {
@@ -88,4 +86,3 @@ post {
             sh 'docker system prune -f'
           }
         }
-    }
