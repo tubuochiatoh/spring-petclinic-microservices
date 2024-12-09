@@ -63,7 +63,7 @@ pipeline {
                 }
             } 
         }   
-        
+
         stage('Push Images to Docker Registry') {
             steps {
                 script {
@@ -79,7 +79,15 @@ pipeline {
                     '''
                 }
             } 
-        }  
-    }    
+        } 
+
+             post {
+                always {
+                    echo 'Cleaning up ...'
+                    sh 'docker system prune -f'
+                }
+             }
+    }   
+
 }
     
