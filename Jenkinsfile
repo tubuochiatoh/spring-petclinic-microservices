@@ -83,6 +83,7 @@ pipeline {
             echo 'Cleaning up...'
             sh 'docker system prune -f'
         }
+    }  
 
     post {
 
