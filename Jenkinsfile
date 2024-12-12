@@ -83,6 +83,17 @@ pipeline {
             echo 'Cleaning up...'
             sh 'docker system prune -f'
         }
+
+    post {
+
+        always {
+
+            cleanWs()
+
+        }
+
+    }
+    
         success {
             // Archive and publish test results of the spring-petclinic
             junit '**/target/surefire-reports/*.xml'
