@@ -5,16 +5,14 @@ pipeline {
     }
 
     stages {
-        
         stage('Credential Scanner for detecting Secrets') {
             steps {
                 script {
-                    def buildUrl = env.BUILD_URL
-                    sh "gitleaks detect -v --no-git --source . --report-format json --report-path secrets.json || exit 0"
+                    sh "gitleaks detect -v --no-git --source . --report-format json --report-path secrets.json || echo 'Secrets detected. Review secrets.json.'"
                 }
             }
-        }    
-        
+        }
+
         stage('Build Pet Clinic') {
             steps {
                 sh "mvn clean install"
@@ -23,24 +21,17 @@ pipeline {
 
         stage('Test Petclinic') {
             steps {
-                script {
-                    // Run Unit Test
-                    sh 'mvn test'
-                }
+                sh 'mvn test'
             }
         }
 
         stage('Package Petclinic App') {
             steps {
-                script {
-                    // Package the application (For example, create a JAR or WAR file)
-                    sh 'mvn package'
-                }
+                sh 'mvn package'
             }
             post {
                 success {
-                    // Archive the package artifact and put it in a folder
-                    archiveArtifacts artifacts: 'spring-petclinic-*/target/*.jar', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
                 }
             }
         }
@@ -48,25 +39,24 @@ pipeline {
         stage('Containerize Microservices') {
             steps {
                 script {
-                    echo 'Building Docker images for microservices...'
-                    // Assuming a Dockerfile is in each microservice directory
                     sh '''
-                    for service in $(ls microservices); do
-                        docker build -t ferdinandtubuo/${service}:latest ./microservices/${service}
-                    done
+                    if [ -d microservices ]; then
+                        for service in $(ls microservices); do
+                            echo "Building image for $service"
+                            docker build -t ferdinandtubuo/${service}:latest ./microservices/${service}
+                        done
+                    else
+                        echo "No microservices directory found!"
+                    fi
                     '''
                 }
             }
-        }   
+        }
 
         stage('Push Images to Dockerhub Registry') {
             steps {
-                script {
-                    echo 'Pushing Docker images to registry...'
-                    // Login to the Docker registry
-                    sh 'docker login -u $ferdinandtubuo -p $C@madonisquinta19902014 https://app.docker.com/'
-
-                    // Push images
+                withCredentials([usernamePassword(credentialsId: 'docker-credentials-id', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     sh '''
                     for service in $(ls microservices); do
                         docker push ferdinandtubuo/${service}:latest
@@ -74,29 +64,16 @@ pipeline {
                     '''
                 }
             }
-        } 
-
-    
+        }
+    }
 
     post {
         always {
             echo 'Cleaning up...'
             sh 'docker system prune -f'
-        }
-    }  
-
-    post {
-
-        always {
-
             cleanWs()
-
         }
-
-    }
-    
         success {
-            // Archive and publish test results of the spring-petclinic
             junit '**/target/surefire-reports/*.xml'
         }
         failure {
