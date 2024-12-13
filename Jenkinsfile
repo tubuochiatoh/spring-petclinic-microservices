@@ -43,7 +43,12 @@ pipeline {
                     // Assuming a Dockerfile is in each microservice directory
                     sh '''
                     for service in $(ls microservices); do
-                        docker build -t ferdinandtubuo/${service}:latest ./microservices/${service}
+                        docker build \
+                        --build-arg ARTIFACT_NAME={service} \
+                        --build-arg EXPOSED_PORT=8080
+                        -t ferdinandtubuo/${service}:latest \
+                        -f ./microservices/${service}/Dockerfile \
+                        ./microservices/${service}
                     done
                     '''
                 }
@@ -55,7 +60,8 @@ pipeline {
                 script {
                     echo 'Pushing Docker images to registry...'
                     // Login to the Docker registry
-                    sh 'docker login -u $ferdinandtubuo -p $C@madonisquinta19902014 https://app.docker.com/'
+                   withCredentials([usernamePassword(credentialsId: 'Dockerhub_id', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD https://app.docker.com/'  
 
                     // Push images
                     sh '''
