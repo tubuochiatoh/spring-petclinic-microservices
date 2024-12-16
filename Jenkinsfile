@@ -44,11 +44,11 @@ pipeline {
                     sh '''
                     for service in $(ls microservices); do
                         docker build \
-                        --build-arg ARTIFACT_NAME={service} \
+                        --build-arg ARTIFACT_NAME=service \
                         --build-arg EXPOSED_PORT=8080
                         -t ferdinandtubuo/${service}:latest \
-                        -f ./microservices/${service}/Dockerfile \
-                        ./microservices/${service}
+                        -f ./microservices/$service/Dockerfile \
+                        ./microservices/$service
                     done
                     '''
                 }
@@ -66,7 +66,7 @@ pipeline {
                     // Push images
                     sh '''
                     for service in $(ls microservices); do
-                        docker push ferdinandtubuo/${service}:latest
+                        docker push ferdinandtubuo/$service:latest
                     done
                     '''
                 }
