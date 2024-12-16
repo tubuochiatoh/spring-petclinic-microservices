@@ -36,60 +36,58 @@ pipeline {
             }
         }
 
-        stage('Containerize Microservices') {
+        stage('Containerize Petclinic Application') {
             steps {
                 script {
-                    echo 'Building Docker images for microservices...'
-                    // Assuming a Dockerfile is in each microservice directory
-                    sh '''
-                    for service in $(ls microservices); do
-                        docker build \
-                        --build-arg ARTIFACT_NAME=service \
-                        --build-arg EXPOSED_PORT=8080
-                        -t ferdinandtubuo/${service}:latest \
-                        -f ./microservices/$service/Dockerfile \
-                        ./microservices/$service
-                    done
-                    '''
-                }
-            }
-        }   
+                    echo 'Building the Docker image for the Spring Petclinic application...'
 
-        stage('Push Images to Dockerhub Registry') {
-            steps {
-                script {
-                    echo 'Pushing Docker images to registry...'
-                    // Login to the Docker registry
-                   withCredentials([usernamePassword(credentialsId: 'Dockerhub_id', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD https://app.docker.com/'  
+                    // Define artifact and port for the Docker build
+                    def artifactName = "spring-petclinic"
+                    def exposedPort = 8080
 
-                    // Push images
-                    sh '''
-                    for service in $(ls microservices); do
-                        docker push ferdinandtubuo/$service:latest
-                    done
-                    '''
+                    // Build Docker image
+                    sh """
+                    docker build \
+                        --build-arg ARTIFACT_NAME=${artifactName} \
+                        --build-arg EXPOSED_PORT=${exposedPort} \
+                        -t ferdinandtubuo/${artifactName}:latest \
+                        -f Dockerfile .
+                    """
                 }
             }
         }
-    } 
-}
-    
+
+        stage('Push Image to Docker Hub') {
+            steps {
+                script {
+                    echo 'Pushing the Docker image to Docker Hub...'
+
+                    // Docker login and push
+                    withCredentials([usernamePassword(credentialsId: 'Dockerhub_id', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh """
+                        docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+                        docker push ferdinandtubuo/spring-petclinic:latest
+                        """
+                    }
+                }
+            }
+        }
+    }
 
     post {
         always {
-            cleanWs()
+            echo 'Cleaning up workspace...'
+            cleanWs() // Clean workspace after pipeline execution
         }
-      
 
-
-    
         success {
-            // Archive and publish test results of the spring-petclinic
+            echo 'Pipeline completed successfully!'
+            // Publish test results
             junit '**/target/surefire-reports/*.xml'
         }
+
         failure {
-            echo 'Pipeline failed.'
+            echo 'Pipeline failed. Check logs for details.'
         }
     }
 }
