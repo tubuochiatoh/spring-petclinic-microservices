@@ -8,7 +8,11 @@ pipeline {
         stage('Credential Scanner for detecting Secrets') {
             steps {
                 script {
-                    sh "gitleaks detect -v --no-git --source . --report-format json --report-path secrets.json || echo 'Secrets detected. Review secrets.json.'"
+                    sh """
+                    gitleaks detect -v --no-git --source . \
+                    --report-format json --report-path secrets.json || \
+                    echo 'Secrets detected. Review secrets.json.'
+                    """
                 }
             }
         }
@@ -21,13 +25,13 @@ pipeline {
 
         stage('Test Petclinic') {
             steps {
-                sh 'mvn test'
+                sh "mvn test"
             }
         }
 
         stage('Package Petclinic App') {
             steps {
-                sh 'mvn package'
+                sh "mvn package"
             }
             post {
                 success {
@@ -36,38 +40,35 @@ pipeline {
             }
         }
 
-        stage('Containerize Petclinic Application') {
+        stage('Containerize Microservices') {
             steps {
                 script {
-                    echo 'Building the Docker image for the Spring Petclinic application...'
+                    echo 'Building Docker images for microservices...'
+                    def MICROSERVICE = "spring-petclinic-admin-server spring-petclinic-api-gateway spring-petclinic-config-server spring-petclinic-customers-service spring-petclinic-discovery-server spring-petclinic-vets-service spring-petclinic-visits-service"
 
-                    // Define artifact and port for the Docker build
-                    def artifactName = "spring-petclinic"
-                    def exposedPort = 8080
-
-                    // Build Docker image
-                    sh """
-                    docker build \
-                        --build-arg ARTIFACT_NAME=${artifactName} \
-                        --build-arg EXPOSED_PORT=${exposedPort} \
-                        -t ferdinandtubuo/${artifactName}:latest \
-                        -f Dockerfile .
-                    """
+                    sh '''
+                    for ARTIFACT_NAME in ''' + MICROSERVICE + '''; do
+                        docker build -t ferdinandtubuo/${ARTIFACT_NAME}:3.2.7 .
+                    done
+                    '''
                 }
             }
         }
 
-        stage('Push Image to Docker Hub') {
+        stage('Push Images to Dockerhub Registry') {
             steps {
                 script {
-                    echo 'Pushing the Docker image to Docker Hub...'
-
-                    // Docker login and push
+                    echo 'Pushing Docker images to registry...'
                     withCredentials([usernamePassword(credentialsId: 'Dockerhub_id', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh """
-                        docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-                        docker push ferdinandtubuo/spring-petclinic:latest
-                        """
+                        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD https://index.docker.io/v1/'
+
+                        def MICROSERVICE = "spring-petclinic-admin-server spring-petclinic-api-gateway spring-petclinic-config-server spring-petclinic-customers-service spring-petclinic-discovery-server spring-petclinic-vets-service spring-petclinic-visits-service"
+
+                        sh '''
+                        for ARTIFACT_NAME in ''' + MICROSERVICE + '''; do
+                            docker push ferdinandtubuo/${ARTIFACT_NAME}:3.2.7
+                        done
+                        '''
                     }
                 }
             }
@@ -76,18 +77,15 @@ pipeline {
 
     post {
         always {
-            echo 'Cleaning up workspace...'
-            cleanWs() // Clean workspace after pipeline execution
+            cleanWs()
         }
 
         success {
-            echo 'Pipeline completed successfully!'
-            // Publish test results
             junit '**/target/surefire-reports/*.xml'
         }
 
         failure {
-            echo 'Pipeline failed. Check logs for details.'
+            echo 'Pipeline failed.'
         }
     }
 }
