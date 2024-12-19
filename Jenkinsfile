@@ -70,7 +70,7 @@ pipeline {
                         def MICROSERVICES = [
                             "spring-petclinic-admin-server",
                             "spring-petclinic-api-gateway",
-                            "spring-petclinic-config-server"
+                            "spring-petclinic-config-server",
                             "spring-petclinic-customers-service",
                             "spring-petclinic-discovery-server",
                             "spring-petclinic-vets-service",
