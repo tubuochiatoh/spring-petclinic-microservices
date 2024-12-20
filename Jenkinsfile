@@ -4,11 +4,6 @@ pipeline {
         maven 'maven38'
     }
 
-    environment {
-        ARTIFACT_NAME = 'spring-petclinic' // Replace with your artifact name
-        EXPOSED_PORT = '8080' // Replace with your port
-    }
-
     stages {
         stage('Credential Scanner for detecting Secrets') {
             steps {
@@ -49,7 +44,8 @@ pipeline {
                         "spring-petclinic-vets-service",
                         "spring-petclinic-visits-service"
                     ]
-                    MICROSERVICES.each { service ->
+                    for (service in MICROSERVICES) {
+                        echo "Building Docker image for ${service}"
                         sh """
                         docker build \
                             --build-arg ARTIFACT_NAME=${service} \
@@ -76,7 +72,8 @@ pipeline {
                             "spring-petclinic-vets-service",
                             "spring-petclinic-visits-service"
                         ]
-                        MICROSERVICES.each { service ->
+                        for (service in MICROSERVICES) {
+                            echo "Pushing Docker image for ${service}"
                             sh "docker push ferdinandtubuo/${service}:3.2.7"
                         }
                     }
