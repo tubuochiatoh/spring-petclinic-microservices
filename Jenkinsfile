@@ -20,6 +20,35 @@ pipeline {
                 sh "mvn clean install"
             }
         }
+        stage('Test Petclinic') {
+            steps {
+                script {
+                    //Run Unit Test
+                    sh 'mvn test'
+                }
+            }
+            
+            post {
+                always {
+                    //Archive and publish test results of the spring-petclinic"
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+         stage('Test Petclinic') {
+            steps {
+                script {
+                    //Run Unit Test
+                    sh 'mvn test'
+                }
+            }
+            post {
+                always {
+                    //Archive and publish test results of the spring-petclinic"
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
 
         stage('Package Petclinic App') {
             steps {
@@ -87,12 +116,5 @@ pipeline {
             cleanWs()
         }
 
-        success {
-            junit '**/target/surefire-reports/*.xml'
-        }
-
-        failure {
-            echo 'Pipeline failed.'
-        }
     }
 }
