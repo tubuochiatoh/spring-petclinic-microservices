@@ -24,7 +24,7 @@ pipeline {
         stage('Install Snyk CLI') {
             steps {
                sh '''
-               curl -sL https://snyk.io/install | bash
+               curl -fsSL https://static.snyk.io/cli/latest/install.sh | bash
                export PATH=$PATH:/usr/local/bin
                snyk --version
                '''
