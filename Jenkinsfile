@@ -4,6 +4,10 @@ pipeline {
         maven 'maven38'
     }
 
+    environment {
+        SNYK_TOKEN = credentials('snyk-docker') // Add Snyk API token from Jenkins credentials
+    }
+
     stages {
         stage('Credential Scanner for detecting Secrets') {
             steps {
@@ -20,21 +24,25 @@ pipeline {
                 sh "mvn clean install"
             }
         }
-        // stage('Test Petclinic') {
-        //     steps {
-        //         script {
-        //             //Run Unit Test
-        //             sh 'mvn test'
-        //         }
-        //     }
-            
-        //     post {
-        //         always {
-        //             //Archive and publish test results of the spring-petclinic"
-        //             junit '**/target/surefire-reports/*.xml'
-        //         }
-        //     }
-        // }
+
+          stage('Snyk Dependency Scan') {
+            steps {
+                script {
+                    // Run Snyk CLI to scan for vulnerabilities in dependencies
+                    sh """
+                    snyk auth $SNYK_TOKEN
+                    snyk test --all-projects
+                    """
+                }
+            }
+
+             post {
+                failure {
+                    echo "Snyk found vulnerabilities in project dependencies!"
+                }
+            }
+        }
+       
          stage('Test Petclinic') {
             steps {
                 script {
