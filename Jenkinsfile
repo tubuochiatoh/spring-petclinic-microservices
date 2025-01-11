@@ -26,7 +26,7 @@ pipeline {
                sh '''
                curl -fsSL https://github.com/snyk/snyk/releases/latest/download/snyk-linux -o snyk
                chmod +x snyk
-               mv snyk /usr/local/bin
+               sudo mv snyk /usr/local/bin
                snyk --version
                '''
     }
