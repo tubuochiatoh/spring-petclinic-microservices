@@ -5,7 +5,7 @@ pipeline {
     }
 
     environment {
-        SNYK_TOKEN = credentials('snyk-docker') // Add Snyk API token from Jenkins credentials
+        SNYK_TOKEN = credentials('Snyk_API_Token') // Add Snyk API token from Jenkins credentials
     }
 
     stages {
