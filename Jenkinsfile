@@ -4,10 +4,6 @@ pipeline {
         maven 'maven38'
     }
 
-    environment {
-        SNYK_TOKEN = credentials('Snyk_API_Token') // Add Snyk API token from Jenkins credentials
-    }
-
     stages {
         stage('Credential Scanner for detecting Secrets') {
             steps {
@@ -25,7 +21,21 @@ pipeline {
             }
         }
 
+        stage('Install Snyk CLI') {
+            steps {
+               sh '''
+               curl -sL https://snyk.io/install | bash
+               export PATH=$PATH:/usr/local/bin
+               snyk --version
+               '''
+    }
+}
+
+
           stage('Snyk Dependency Scan') {
+              environment {
+                SNYK_TOKEN = credentials('Snyk_API_Token') // use credentials securely
+              }
             steps {
                 script {
                     // Run Snyk CLI to scan for vulnerabilities in dependencies
