@@ -55,9 +55,7 @@ pipeline {
         // }
 
          stage('Snyk Scan') {
-             environment {
-                 SNYK_TOKEN = credentials('Snyk_API_Token') // use credentials securely
-             }
+            
             steps {
             echo 'Testing...'
             snykSecurity(
