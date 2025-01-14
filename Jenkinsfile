@@ -21,16 +21,16 @@ pipeline {
             }
         }
 
-        stage('Install Snyk CLI') {
-            steps {
-               sh '''
-               curl -fsSL https://github.com/snyk/snyk/releases/latest/download/snyk-linux -o snyk
-               chmod +x snyk
-               sudo mv snyk /usr/local/bin
-               snyk --version
-               '''
-    }
-}
+//         stage('Install Snyk CLI') {
+//             steps {
+//                sh '''
+//                curl -fsSL https://github.com/snyk/snyk/releases/latest/download/snyk-linux -o snyk
+//                chmod +x snyk
+//                sudo mv snyk /usr/local/bin
+//                snyk --version
+//                '''
+//     }
+// }
 
 
         //   stage('Snyk Dependency Scan') {
@@ -54,17 +54,17 @@ pipeline {
         //     }
         // }
 
-         stage('Snyk Scan') {
+        //  stage('Snyk Scan') {
             
-            steps {
-            echo 'Testing...'
-            snykSecurity(
-                snykInstallation: 'snyk@latest',
-                snykTokenId: 'snyk-jenkins-token',
-                // place other parameters here
-            )
-            }
-        }
+        //     steps {
+        //     echo 'Testing...'
+        //     snykSecurity(
+        //         snykInstallation: 'snyk@latest',
+        //         snykTokenId: 'snyk-jenkins-token',
+        //         // place other parameters here
+        //     )
+        //     }
+        // }
        
          stage('Test Petclinic') {
             steps {
@@ -117,6 +117,29 @@ pipeline {
                 }
             }
         }
+
+         stage('Install Snyk CLI') {
+            steps {
+               sh '''
+               curl -fsSL https://github.com/snyk/snyk/releases/latest/download/snyk-linux -o snyk
+               chmod +x snyk
+               sudo mv snyk /usr/local/bin
+               snyk --version
+               '''
+    }
+}
+
+        stage('Snyk Scan') {
+                    
+                    steps {
+                    echo 'Testing...'
+                    snykSecurity(
+                        snykInstallation: 'snyk@latest',
+                        snykTokenId: 'snyk-jenkins-token',
+                        // place other parameters here
+                    )
+                    }
+                }
 
         stage('Push Images to Dockerhub Registry') {
             steps {
