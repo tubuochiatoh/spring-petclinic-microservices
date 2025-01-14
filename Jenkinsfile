@@ -33,24 +33,38 @@ pipeline {
 }
 
 
-          stage('Snyk Dependency Scan') {
-              environment {
-                SNYK_TOKEN = credentials('Snyk_API_Token') // use credentials securely
-              }
-            steps {
-                script {
-                    // Run Snyk CLI to scan for vulnerabilities in dependencies
-                    sh """
-                    snyk auth $SNYK_TOKEN
-                    snyk test --all-projects
-                    """
-                }
-            }
+        //   stage('Snyk Dependency Scan') {
+        //       environment {
+        //         SNYK_TOKEN = credentials('Snyk_API_Token') // use credentials securely
+        //       }
+        //     steps {
+        //         script {
+        //             // Run Snyk CLI to scan for vulnerabilities in dependencies
+        //             sh """
+        //             snyk auth $SNYK_TOKEN
+        //             snyk test --all-projects
+        //             """
+        //         }
+        //     }
 
-             post {
-                failure {
-                    echo "Snyk found vulnerabilities in project dependencies!"
-                }
+        //      post {
+        //         failure {
+        //             echo "Snyk found vulnerabilities in project dependencies!"
+        //         }
+        //     }
+        // }
+
+         stage('Snyk Scan') {
+             environment {
+                 SNYK_TOKEN = credentials('Snyk_API_Token') // use credentials securely
+             }
+            steps {
+            echo 'Testing...'
+            snykSecurity(
+                snykInstallation: 'snyk@latest',
+                snykTokenId: '$SNYK_TOKEN',
+                // place other parameters here
+            )
             }
         }
        
