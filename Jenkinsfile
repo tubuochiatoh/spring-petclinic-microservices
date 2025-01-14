@@ -62,7 +62,7 @@ pipeline {
             echo 'Testing...'
             snykSecurity(
                 snykInstallation: 'snyk@latest',
-                snykTokenId: '$SNYK_TOKEN',
+                snykTokenId: 'f686f0d6-1db4-4e68-8c5c-0383776c965b',
                 // place other parameters here
             )
             }
