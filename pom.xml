@@ -34,7 +34,7 @@
 
         <!-- Workaround for resolving the issue while using the provided lombok dependency in upgraded Java version.
         Should be removed while future upgrading-->
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.36</lombok.version>
 
         <docker.image.prefix>springcommunity</docker.image.prefix>
         <docker.image.exposed.port>9090</docker.image.exposed.port>
