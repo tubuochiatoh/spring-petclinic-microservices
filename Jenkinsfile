@@ -129,17 +129,44 @@ pipeline {
     }
 }
 
-        stage('Snyk Scan') {
+        // stage('Snyk Scan') {
                     
-                    steps {
-                    echo 'Testing...'
-                    snykSecurity(
-                        snykInstallation: 'snyk@latest',
-                        snykTokenId: 'snyk-jenkins-token',
-                        // place other parameters here
-                    )
+        //             steps 
+        //             {
+        //             echo 'Testing...'
+        //             snykSecurity(
+        //                 snykInstallation: 'snyk@latest',
+        //                 snykTokenId: 'snyk-jenkins-token',
+        //                 // place other parameters here
+        //             )
+        //             }
+        //         }
+
+        stage('Scan Containers with Snyk') {
+            environment {
+                SNYK_TOKEN = credentials('Snyk_API_Token')
+            }
+            steps {
+                script {
+                    def MICROSERVICES = [
+                        "spring-petclinic-admin-server",
+                        "spring-petclinic-api-gateway",
+                        "spring-petclinic-config-server",
+                        "spring-petclinic-customers-service",
+                        "spring-petclinic-discovery-server",
+                        "spring-petclinic-vets-service",
+                        "spring-petclinic-visits-service"
+                    ]
+                    for (service in MICROSERVICES) {
+                        echo "Scanning Container image for ${service}"
+                        sh """
+                        snyk container test ferdinandtubuo/${service}:3.2.7 --org=my-org-id || \
+                        echo "Scan failed for ${service}"
+                        """
                     }
                 }
+            }
+        }
 
         stage('Push Images to Dockerhub Registry') {
             steps {
