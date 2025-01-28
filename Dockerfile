@@ -7,7 +7,7 @@ RUN java -Djarmode=layertools -jar application.jar extract
 
 FROM eclipse-temurin:17
 WORKDIR application
-Run apt-get && apt update
+RUN apt-get && apt update
 
 ARG EXPOSED_PORT
 EXPOSE ${EXPOSED_PORT}
