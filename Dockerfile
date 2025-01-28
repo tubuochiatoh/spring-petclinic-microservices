@@ -1,11 +1,11 @@
-FROM eclipse-temurin:17 AS builder
+FROM eclipse-temurin:21 AS builder
 WORKDIR application
 ARG ARTIFACT_NAME
 COPY ${ARTIFACT_NAME}/target/${ARTIFACT_NAME}-3.2.7.jar application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
 
-FROM eclipse-temurin:17
+FROM eclipse-temurin:21
 WORKDIR application
 RUN apt update
 
