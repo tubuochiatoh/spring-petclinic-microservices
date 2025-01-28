@@ -1,13 +1,12 @@
-FROM eclipse-temurin:23 AS builder
+FROM amazoncorretto:21.0.6-al2023 AS builder
 WORKDIR application
 ARG ARTIFACT_NAME
 COPY ${ARTIFACT_NAME}/target/${ARTIFACT_NAME}-3.2.7.jar application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
 
-FROM eclipse-temurin:23
+FROM amazoncorretto:21.0.6-al2023
 WORKDIR application
-RUN apt update
 
 ARG EXPOSED_PORT
 EXPOSE ${EXPOSED_PORT}
