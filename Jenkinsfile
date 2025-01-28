@@ -160,7 +160,7 @@ pipeline {
                     for (service in MICROSERVICES) {
                         echo "Scanning Container image for ${service}"
                         sh """
-                        snyk container test ferdinandtubuo/${service}:3.2.7 --fail-on=all
+                        snyk container test ferdinandtubuo/${service}:3.2.7 
                         """
                     }
                 }
