@@ -1,7 +1,7 @@
 FROM amazoncorretto:21.0.6-al2023 AS builder
 WORKDIR application
 ARG ARTIFACT_NAME
-COPY ${ARTIFACT_NAME}/target/${ARTIFACT_NAME}-3.2.7.jar application.jar
+COPY ${ARTIFACT_NAME}/target/${ARTIFACT_NAME}-3.4.1.jar application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
 
