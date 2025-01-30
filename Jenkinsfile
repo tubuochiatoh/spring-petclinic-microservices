@@ -110,7 +110,7 @@ pipeline {
                         docker build \
                             --build-arg ARTIFACT_NAME=${service} \
                             --build-arg EXPOSED_PORT=8080 \
-                            -t ferdinandtubuo/${service}:3.2.7 \
+                            -t ferdinandtubuo/${service}:3.4.1 \
                             .
                         """
                     }
@@ -160,7 +160,7 @@ pipeline {
                     for (service in MICROSERVICES) {
                         echo "Scanning Container image for ${service}"
                         sh """
-                        snyk container test ferdinandtubuo/${service}:3.2.7 
+                        snyk container test ferdinandtubuo/${service}:3.4.1 
                         """
                     }
                 }
@@ -183,7 +183,7 @@ pipeline {
                         ]
                         for (service in MICROSERVICES) {
                             echo "Pushing Docker image for ${service}"
-                            sh "docker push ferdinandtubuo/${service}:3.2.7"
+                            sh "docker push ferdinandtubuo/${service}:3.4.1"
                         }
                     }
                 }
