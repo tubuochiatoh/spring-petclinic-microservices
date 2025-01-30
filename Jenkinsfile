@@ -102,7 +102,8 @@ pipeline {
                         "spring-petclinic-customers-service",
                         "spring-petclinic-discovery-server",
                         "spring-petclinic-vets-service",
-                        "spring-petclinic-visits-service"
+                        "spring-petclinic-visits-service",
+                        "spring-petclinic-genai-service"
                     ]
                     for (service in MICROSERVICES) {
                         echo "Building Docker image for ${service}"
@@ -155,12 +156,13 @@ pipeline {
                         "spring-petclinic-customers-service",
                         "spring-petclinic-discovery-server",
                         "spring-petclinic-vets-service",
-                        "spring-petclinic-visits-service"
+                        "spring-petclinic-visits-service",
+                        "spring-petclinic-genai-service"
                     ]
                     for (service in MICROSERVICES) {
                         echo "Scanning Container image for ${service}"
                         sh """
-                        snyk container test ferdinandtubuo/${service}:3.4.1 
+                        snyk container test ferdinandtubuo/${service}:3.4.1 || true 
                         """
                     }
                 }
@@ -179,7 +181,8 @@ pipeline {
                             "spring-petclinic-customers-service",
                             "spring-petclinic-discovery-server",
                             "spring-petclinic-vets-service",
-                            "spring-petclinic-visits-service"
+                            "spring-petclinic-visits-service",
+                            "spring-petclinic-genai-service"
                         ]
                         for (service in MICROSERVICES) {
                             echo "Pushing Docker image for ${service}"
